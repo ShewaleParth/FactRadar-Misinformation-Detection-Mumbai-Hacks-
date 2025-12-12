@@ -1,0 +1,12 @@
+google-generativeai
+groq
+duckduckgo-search
+python-dotenv
+rich
+fastapi
+uvicorn
+pydantic
+PyJWT
+passlib
+bcrypt
+email-validator
