@@ -168,4 +168,4 @@ MIT
 
 ## 🤝 Contributing
 
-This is a course submission project demonstrating multi-agent systems and observability patterns.
+This is a Mumbai Hacks 2025 Project Submission  for Misinformation Domain.
