@@ -13,7 +13,8 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24  # 24 hours
 
 # Password hashing
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Using pbkdf2_sha256 to avoid bcrypt's 72-byte limit and potential Windows binary issues
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 logger = logging.getLogger(__name__)
 
 # Pydantic Models for Auth
@@ -64,7 +65,7 @@ class UserManager:
     def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return pwd_context.verify(plain_password, hashed_password)
 
-    def create_user(self, user: UserSignup) -> Optional[UserResponse]:
+    def create_user(self, user: UserSignup) -> UserResponse:
         """Register a new user"""
         try:
             password_hash = self.get_password_hash(user.password)
@@ -86,11 +87,10 @@ class UserManager:
                     created_at=created_at
                 )
         except sqlite3.IntegrityError:
-            # Email already exists
-            return None
+            raise ValueError("Email already registered")
         except Exception as e:
             logger.error(f"Error creating user: {e}")
-            return None
+            raise Exception(f"Error creating user: {str(e)}")
 
     def get_user_by_email(self, email: str) -> Optional[Dict]:
         """Get user by email"""

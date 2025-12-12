@@ -152,10 +152,14 @@ user_manager = UserManager()
 @app.post("/auth/signup", response_model=UserResponse)
 async def signup(user: UserSignup):
     """Register a new user"""
-    created_user = user_manager.create_user(user)
-    if not created_user:
-        raise HTTPException(status_code=400, detail="Email already registered")
-    return created_user
+    try:
+        created_user = user_manager.create_user(user)
+        return created_user
+    except ValueError as e:
+         raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Signup error: {e}")
+        raise HTTPException(status_code=500, detail=f"Signup processing failed: {str(e)}")
 
 @app.post("/auth/login", response_model=Token)
 async def login(user: UserLogin):
